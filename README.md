@@ -35,11 +35,41 @@ Table `exoplanets_full` in a PostgreSQL database named `astronomy`:
 
 See `queries.sql` for the full query set.
 
+## Findings
+
+- **Detection method shifted over time.** Radial Velocity dominated
+  discoveries through the early 2000s, but Transit photometry overtook it
+  after Kepler's 2009 launch and now accounts for the large majority of
+  confirmed planets (4,676 of ~6,300).
+- **Confirmed planets skew large.** Neptune-sized and Jupiter-sized planets
+  outnumber Earth-sized ones by roughly 4:1 — not because small planets are
+  rarer in the galaxy, but because Transit and Radial Velocity are both far
+  more sensitive to large planets, which block more light / cause bigger
+  stellar wobbles.
+- **Known multi-planet systems show up correctly.** The query for
+  planets-per-star surfaces KOI-351 (Kepler-90, 8 planets) and TRAPPIST-1
+  (7 planets) at the top — a useful sanity check that the data and queries
+  are behaving as expected.
+- **Discovery distance tracks survey history.** Early Radial Velocity-era
+  planets (1995–2003) cluster within ~50 pc, since RV only works on bright,
+  nearby stars. A large batch of Kepler-confirmed planets (~2016) sits much
+  farther out (~800 pc), reflecting Kepler's single distant field of view.
+  TESS-era planets (2018+) hold a similarly high, steady distance with more
+  consistent year-to-year counts.
+
+![Average discovery distance vs. year](distance_trend.png)
+
 ## Python / visualization
 
-`exoplanet_distance_trend.py` connects to the database via SQLAlchemy,
-pulls the distance-over-time query into a pandas DataFrame, and plots it
-against the count of planets found per year.
+Three scripts, all following the same pattern: connect via SQLAlchemy,
+pull a query into a pandas DataFrame, plot with matplotlib.
+
+- `distance_trend.py` — average discovery distance per year,
+  with planet count per year as context bars
+- `detection_methods.py` — bar chart of planet count by
+  detection method
+- `size_distribution.py` — bar chart of planet count by size
+  category (Earth-sized / Super-Earth / Neptune-sized / Jupiter-sized)
 
 ### Setup
 
@@ -47,6 +77,8 @@ against the count of planets found per year.
 py -m pip install psycopg2-binary sqlalchemy pandas matplotlib
 $env:ASTRONOMY_DB_PASSWORD = "your_postgres_password"
 py exoplanet_distance_trend.py
+py exoplanet_detection_methods.py
+py exoplanet_size_distribution.py
 ```
 
 ## Tools used
